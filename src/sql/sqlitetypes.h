@@ -367,6 +367,8 @@ private:
 class IndexedColumn
 {
 public:
+    IndexedColumn() {}
+
     IndexedColumn(const std::string& name, bool expr, const std::string& order = std::string(), const std::string& collation = std::string())
         : m_name(name),
           m_isExpression(expr),
