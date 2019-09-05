@@ -1228,8 +1228,9 @@ std::string CreateTableWalker::parseConflictClause(antlr::RefAST c)
 std::string IndexedColumn::toString(const std::string& indent, const std::string& sep) const
 {
     std::string name = m_isExpression ? m_name : escapeIdentifier(m_name);
+    std::string collation = (m_collation.empty() ? "" : (sep + "COLLATE " + m_collation));
     std::string order = (m_order.empty() ? "" : (sep + m_order));
-    return indent + name + order;
+    return indent + name + collation + order;
 }
 
 Index& Index::operator=(const Index& rhs)
@@ -1395,6 +1396,7 @@ void CreateIndexWalker::parsecolumn(Index* index, antlr::RefAST c)
     std::string name;
     bool isExpression;
     std::string order;
+    std::string collation;
 
     // First count the number of nodes used for the name or the expression. We reach the end of the name nodes list when we either
     // get to the end of the list, get to a COMMA or a RPAREN, or get to the COLLATE keyword or get to the ASC/DESC keywords.
@@ -1436,15 +1438,16 @@ void CreateIndexWalker::parsecolumn(Index* index, antlr::RefAST c)
         case sqlite3TokenTypes::DESC:
             order = c->getText().c_str();
             break;
-        default:
-            // TODO Add support for COLLATE
+        case sqlite3TokenTypes::COLLATE:
+            c = c->getNextSibling();
+            collation = tablename(c);
             index->setFullyParsed(false);
         }
 
         c = c->getNextSibling();
     }
 
-    index->fields.emplace_back(name, isExpression, order);
+    index->fields.emplace_back(name, isExpression, order, collation);
 }
 
 

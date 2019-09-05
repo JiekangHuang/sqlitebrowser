@@ -367,10 +367,11 @@ private:
 class IndexedColumn
 {
 public:
-    IndexedColumn(const std::string& name, bool expr, const std::string& order = std::string())
+    IndexedColumn(const std::string& name, bool expr, const std::string& order = std::string(), const std::string& collation = std::string())
         : m_name(name),
           m_isExpression(expr),
-          m_order(order)
+          m_order(order),
+          m_collation(collation)
     {
     }
 
@@ -383,12 +384,16 @@ public:
     void setOrder(const std::string& order) { m_order = order; }
     std::string order() const { return m_order; }
 
+    void setCollation(const std::string& collation) { m_collation = collation; }
+    std::string collation() const { return m_collation; }
+
     std::string toString(const std::string& indent = "\t", const std::string& sep = "\t") const;
 
 private:
     std::string m_name;
     bool m_isExpression;
     std::string m_order;
+    std::string m_collation;
 };
 
 class Index : public Object
